@@ -1,0 +1,89 @@
+.footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  padding-top: 4rem;
+}
+
+.footerContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  margin-bottom: 4rem;
+}
+
+@media (min-width: 768px) {
+  .footerContainer {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.brand {
+  max-width: 24rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 1rem;
+}
+
+.tagline {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.linksSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.linkGroup h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.linkGroup a {
+  display: block;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.linkGroup a:hover {
+  color: var(--primary);
+}
+
+.social {
+  display: flex;
+  gap: 1rem;
+}
+
+.social a {
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.social a:hover {
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-2px);
+}
+
+.bottomBar {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
