@@ -49,6 +49,8 @@ export const env = {
  */
 export function validateEnv() {
   if (process.env.NODE_ENV === 'test') return;
+  // Skip environment validation during the Next.js build step
+  if (process.env.npm_lifecycle_event === 'build') return;
 
   const result = envSchema.safeParse(process.env);
 
