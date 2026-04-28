@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 import { env } from '@/lib/env';
+import logger from '@/lib/logger';
 
 /**
  * AIService handles all interactions with Google Gemini.
@@ -47,7 +48,7 @@ export class AIService {
       const response = await result.response;
       return response.text();
     } catch (error) {
-      console.error('AIService.askAssistant Error:', error);
+      logger.error({ err: error }, 'AIService.askAssistant Error');
       throw new Error(
         'Failed to generate AI response. This might be due to safety filters or connection issues.'
       );

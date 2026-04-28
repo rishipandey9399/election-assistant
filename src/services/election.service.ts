@@ -1,4 +1,5 @@
 import { env } from '@/lib/env';
+import logger from '@/lib/logger';
 
 /**
  * ElectionService handles interactions with the Google Civic Information API.
@@ -27,7 +28,7 @@ export class ElectionService {
       }
       return await response.json();
     } catch (error) {
-      console.error('ElectionService.getVoterInfo Error:', error);
+      logger.error({ err: error, address }, 'ElectionService.getVoterInfo Error');
       throw error;
     }
   }
@@ -43,7 +44,7 @@ export class ElectionService {
       const response = await fetch(url);
       return await response.json();
     } catch (error) {
-      console.error('ElectionService.getElections Error:', error);
+      logger.error({ err: error }, 'ElectionService.getElections Error');
       throw error;
     }
   }

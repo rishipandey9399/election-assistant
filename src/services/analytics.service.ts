@@ -1,4 +1,5 @@
 import { BigQuery } from '@google-cloud/bigquery';
+import logger from '@/lib/logger';
 
 /**
  * AnalyticsService manages data streaming to Google BigQuery.
@@ -39,7 +40,7 @@ export class AnalyticsService {
       await this.bigquery.dataset(this.datasetId).table(this.tableId).insert(rows);
     } catch (error) {
       // Fail silently to avoid interrupting the main user flow
-      console.error('AnalyticsService.logInteraction Error:', error);
+      logger.error({ err: error }, 'AnalyticsService.logInteraction Error');
     }
   }
 }

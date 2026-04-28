@@ -1,7 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { loader } from '@/components/PollingMap'; // Keeping the loader reference
+import { loader } from '@/components/PollingMap';
+
+/** Client-safe logger — wraps console to allow future swap with a monitoring service. */
+const clientLogger = {
+  error: (...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') console.error(...args);
+  },
+};
 
 /**
  * Headless hook for Google Maps logic.
@@ -43,7 +50,7 @@ export function useGoogleMaps(address: string) {
         });
       }
     } catch (e) {
-      console.error('Error loading Google Maps:', e);
+      clientLogger.error('[useGoogleMaps] Error loading Google Maps:', e);
       setLoadError(true);
     }
   }, [address]);

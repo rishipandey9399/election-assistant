@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import logger from '@/lib/logger';
+import { errorResponse } from '@/lib/api-utils';
 
 /**
  * A notification service that can be triggered by a Cloud Scheduler
@@ -15,7 +17,7 @@ export async function POST(req: Request) {
 
     const { eventId, userEmail } = await req.json();
 
-    console.log(`[Cloud Function Mock] Sending election reminder for ${eventId} to ${userEmail}`);
+    logger.info({ eventId, userEmail }, '[Notifications] Sending election reminder');
 
     // Here you would integrate with SendGrid or Google Cloud Pub/Sub
     return NextResponse.json({
@@ -23,7 +25,6 @@ export async function POST(req: Request) {
       message: 'Reminder notification queued successfully',
     });
   } catch (error) {
-    console.error('Notification Service Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    return errorResponse(error);
   }
 }

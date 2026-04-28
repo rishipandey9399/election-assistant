@@ -2,6 +2,13 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 
+/** Lightweight client-side logger — wraps console to allow future swap with a monitoring service. */
+const clientLogger = {
+  error: (...args: unknown[]) => {
+    if (process.env.NODE_ENV !== 'test') console.error(...args);
+  },
+};
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -20,12 +27,12 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
   };
 
-  public static getDerivedStateFromError(_error: Error): State {
+  public static getDerivedStateFromError(_e: Error): State {
     return { hasError: true };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    clientLogger.error('[ErrorBoundary] Uncaught error:', error, errorInfo);
   }
 
   public render() {
