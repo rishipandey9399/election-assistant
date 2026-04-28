@@ -27,20 +27,23 @@ export default function Navigation() {
 
         {/* Desktop Nav */}
         <div className={styles.desktopNav}>
-          {links.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`${styles.navLink} ${pathname === link.href ? styles.active : ''}`}
-                aria-current={pathname === link.href ? 'page' : undefined}
-              >
-                <Icon size={18} aria-hidden="true" />
-                <span>{link.name}</span>
-              </Link>
-            );
-          })}
+          <ul className={styles.navList} role="list">
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className={`${styles.navLink} ${pathname === link.href ? styles.active : ''}`}
+                    aria-current={pathname === link.href ? 'page' : undefined}
+                  >
+                    <Icon size={18} aria-hidden="true" />
+                    <span>{link.name}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
           <div className={styles.authActions}>
             {user ? (
               <div className={styles.userMenu}>
@@ -77,21 +80,24 @@ export default function Navigation() {
         style={{ display: isOpen ? 'flex' : 'none' }}
         aria-hidden={!isOpen}
       >
-        {links.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.name}
-              href={link.href}
-              onClick={() => setIsOpen(false)}
-              className={`${styles.mobileNavLink} ${pathname === link.href ? styles.active : ''}`}
-              aria-current={pathname === link.href ? 'page' : undefined}
-            >
-              <Icon size={20} aria-hidden="true" />
-              <span>{link.name}</span>
-            </Link>
-          );
-        })}
+        <ul className={styles.mobileNavList} role="list">
+          {links.map((link) => {
+            const Icon = link.icon;
+            return (
+              <li key={link.name}>
+                <Link
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className={`${styles.mobileNavLink} ${pathname === link.href ? styles.active : ''}`}
+                  aria-current={pathname === link.href ? 'page' : undefined}
+                >
+                  <Icon size={20} aria-hidden="true" />
+                  <span>{link.name}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
         {user ? (
           <div className={styles.mobileUserActions}>
             <span>Signed in as {user.displayName}</span>

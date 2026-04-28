@@ -21,6 +21,12 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from '@/context/AuthContext';
+import SkipLink from '@/components/SkipLink';
+import { validateEnv } from '@/lib/env';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+
+// Fail-fast environment validation
+validateEnv();
 
 export default function RootLayout({
   children,
@@ -30,14 +36,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <AuthProvider>
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-          <Navigation />
-          <main id="main-content">{children}</main>
-          <Footer />
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <SkipLink />
+            <Navigation />
+            <main id="main-content" tabIndex={-1}>
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

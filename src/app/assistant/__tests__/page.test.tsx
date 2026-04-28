@@ -7,6 +7,7 @@ jest.mock('lucide-react', () => ({
   User: () => <div data-testid="user-icon" />,
   Bot: () => <div data-testid="bot-icon" />,
   Sparkles: () => <div data-testid="sparkles-icon" />,
+  Trash2: () => <div data-testid="trash-icon" />,
 }));
 
 // Mock the global fetch
@@ -20,6 +21,18 @@ global.fetch = jest.fn(() =>
 // Mock scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
+jest.mock('@/components/Navigation', () => {
+  return function MockNavigation() {
+    return <div data-testid="mock-navigation">Navigation</div>;
+  };
+});
+
+jest.mock('@/components/Footer', () => {
+  return function MockFooter() {
+    return <div data-testid="mock-footer">Footer</div>;
+  };
+});
+
 describe('Assistant Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -28,14 +41,17 @@ describe('Assistant Page', () => {
   it('renders the chat interface and initial message', () => {
     render(<AssistantPage />);
     expect(screen.getByText('AI Election Assistant')).toBeInTheDocument();
-    expect(screen.getByText(/Hello! I am your AI Election Assistant/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Hello! I'm your AI Election Assistant. How can I help you today\?/i)
+    ).toBeInTheDocument();
   });
 
   it('allows user to type and send a message', async () => {
     render(<AssistantPage />);
 
     const input = screen.getByPlaceholderText(/Ask about voter ID/i);
-    const sendButton = screen.getByRole('button');
+    // Find the send button - it has aria-label="Send message" now
+    const sendButton = screen.getByLabelText(/Send message/i);
 
     // Type a message
     fireEvent.change(input, { target: { value: 'How do I register?' } });
@@ -67,7 +83,24 @@ describe('Assistant Page', () => {
 
   it('disables the send button when input is empty', () => {
     render(<AssistantPage />);
-    const sendButton = screen.getByRole('button');
+    const sendButton = screen.getByLabelText(/Send message/i);
     expect(sendButton).toBeDisabled();
+  });
+
+  it('displays error message when fetch fails', async () => {
+    (global.fetch as jest.Mock).mockImplementationOnce(() =>
+      Promise.reject(new Error('Network error'))
+    );
+
+    render(<AssistantPage />);
+    const input = screen.getByPlaceholderText(/Ask about voter ID/i);
+    const sendButton = screen.getByLabelText(/Send message/i);
+
+    fireEvent.change(input, { target: { value: 'Test error' } });
+    fireEvent.click(sendButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Network error/i)).toBeInTheDocument();
+    });
   });
 });

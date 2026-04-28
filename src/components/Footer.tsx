@@ -28,13 +28,13 @@ export default function Footer() {
             <h4>Connect</h4>
             <div className={styles.social}>
               <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter">
-                <MessageCircle size={20} />
+                <MessageCircle size={20} aria-hidden="true" />
               </a>
               <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="Github">
-                <Code size={20} />
+                <Code size={20} aria-hidden="true" />
               </a>
               <a href="mailto:hello@voteassist.com" aria-label="Email">
-                <Mail size={20} />
+                <Mail size={20} aria-hidden="true" />
               </a>
             </div>
           </div>

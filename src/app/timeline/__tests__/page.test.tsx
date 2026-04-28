@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TimelinePage from '../page';
 import { useAuth } from '@/context/AuthContext';
 
@@ -51,5 +52,24 @@ describe('TimelinePage', () => {
 
     const trackButtons = await screen.findAllByText('Track');
     expect(trackButtons.length).toBeGreaterThan(0);
+  });
+
+  it('toggles track status when clicked', async () => {
+    const { trackEvent, untrackEvent } = require('@/lib/firestore');
+    (useAuth as jest.MockedFunction<typeof useAuth>).mockReturnValue({
+      user: { uid: 'test-user' } as any,
+      signInWithGoogle: jest.fn(),
+      logout: jest.fn(),
+      loading: false,
+    });
+
+    render(<TimelinePage />);
+
+    const trackButtons = await screen.findAllByText('Track');
+    fireEvent.click(trackButtons[0]);
+
+    await waitFor(() => {
+      expect(trackEvent).toHaveBeenCalledWith('test-user', expect.any(String));
+    });
   });
 });

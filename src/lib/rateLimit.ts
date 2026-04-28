@@ -1,31 +1,51 @@
-const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
+import { redis } from './redis';
+
+const memoryRateLimitMap = new Map<string, { count: number; timestamp: number }>();
 
 /**
- * A basic in-memory rate limiter.
- * In a production environment, this should be replaced with a Redis-backed
- * rate limiter (like @upstash/ratelimit) since Map() is scoped to the specific serverless function instance.
+ * A shared rate limiter using Redis (atomic INCR) or in-memory fallback.
  *
- * @param ip The IP address or identifier to rate limit.
+ * @param req The incoming request.
  * @param limit Max requests allowed in the window.
  * @param windowMs Time window in milliseconds.
- * @returns boolean - true if allowed, false if rate limited.
+ * @returns Promise<boolean> - true if allowed, false if rate limited.
  */
-export function rateLimit(ip: string, limit = 10, windowMs = 60000): boolean {
+export async function rateLimit(req: Request, limit = 10, windowMs = 60000): Promise<boolean> {
+  const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+  const key = `ratelimit:${ip}`;
+
+  // 1. Try Redis
+  if (redis) {
+    try {
+      const current = await redis.incr(key);
+      if (current === 1) {
+        // Set expiry on the first request in the window
+        await redis.pexpire(key, windowMs);
+      }
+
+      if (current > limit) {
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.warn('Redis rate-limit failed, falling back to in-memory:', err);
+    }
+  }
+
+  // 2. Fallback to in-memory
   const now = Date.now();
-  const record = rateLimitMap.get(ip);
+  const record = memoryRateLimitMap.get(ip);
 
   if (!record) {
-    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    memoryRateLimitMap.set(ip, { count: 1, timestamp: now });
     return true;
   }
 
-  // If the window has passed, reset the count
   if (now - record.timestamp > windowMs) {
-    rateLimitMap.set(ip, { count: 1, timestamp: now });
+    memoryRateLimitMap.set(ip, { count: 1, timestamp: now });
     return true;
   }
 
-  // If within the window, check the limit
   if (record.count >= limit) {
     return false;
   }

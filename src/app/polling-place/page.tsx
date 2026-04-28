@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { MapPin, Search, Navigation } from 'lucide-react';
 import styles from './page.module.css';
+import PollingMap from '@/components/PollingMap';
 
 export default function PollingPlacePage() {
   const [address, setAddress] = useState('');
@@ -53,7 +54,14 @@ export default function PollingPlacePage() {
                   />
                 </div>
               </div>
-              <button type="submit" className={styles.searchBtn} disabled={isSearching}>
+              <button
+                type="submit"
+                className={styles.searchBtn}
+                disabled={isSearching}
+                onClick={(e) => {
+                  if (isSearching) e.preventDefault();
+                }}
+              >
                 {isSearching ? (
                   'Searching...'
                 ) : (
@@ -99,26 +107,8 @@ export default function PollingPlacePage() {
             )}
           </div>
 
-          <div
-            className={`${styles.mapPlaceholder} glass-panel`}
-            role="region"
-            aria-label="Map view"
-          >
-            {result ? (
-              <div className={styles.mockMapContainer}>
-                {/* In a real app, integrate Google Maps iframe or JS API here */}
-                <div className={styles.mockMapPin} aria-hidden="true">
-                  <MapPin size={32} color="#ef4444" fill="#ef4444" />
-                  <div className={styles.mockPulse}></div>
-                </div>
-                <div className={styles.mockMapLabel}>{result.locationName}</div>
-              </div>
-            ) : (
-              <div className={styles.emptyMap}>
-                <MapPin size={48} className={styles.emptyMapIcon} aria-hidden="true" />
-                <p>Enter your address to see your polling location on the map.</p>
-              </div>
-            )}
+          <div className={`${styles.mapContainer} glass-panel`} role="region" aria-label="Map view">
+            <PollingMap address={address} />
           </div>
         </div>
       </div>

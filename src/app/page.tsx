@@ -66,43 +66,55 @@ export default function Home() {
           <div className={styles.featureGrid}>
             <div className={`${styles.featureCard} glass-panel`}>
               <div className={styles.iconWrapper}>
-                <Calendar size={24} />
+                <Calendar size={24} aria-hidden="true" />
               </div>
               <h3>Personalized Timeline</h3>
               <p>
                 Never miss a deadline. We create a custom timeline based on your state&apos;s
                 specific registration and voting dates.
               </p>
-              <Link href="/timeline" className={styles.featureLink}>
-                View Timeline <ArrowRight size={16} />
+              <Link
+                href="/timeline"
+                className={styles.featureLink}
+                aria-label="View your personalized timeline"
+              >
+                View Timeline <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
 
             <div className={`${styles.featureCard} glass-panel`}>
               <div className={styles.iconWrapper}>
-                <MapPin size={24} />
+                <MapPin size={24} aria-hidden="true" />
               </div>
               <h3>Polling Place Locator</h3>
               <p>
                 Powered by Google Maps, find exactly where you need to go to cast your ballot,
                 including early voting locations.
               </p>
-              <Link href="/polling-place" className={styles.featureLink}>
-                Find Location <ArrowRight size={16} />
+              <Link
+                href="/polling-place"
+                className={styles.featureLink}
+                aria-label="Find your polling place location"
+              >
+                Find Location <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
 
             <div className={`${styles.featureCard} glass-panel`}>
               <div className={styles.iconWrapper}>
-                <ShieldCheck size={24} />
+                <ShieldCheck size={24} aria-hidden="true" />
               </div>
               <h3>Verified Information</h3>
               <p>
                 All data is sourced directly from the Google Civic Information API, ensuring you get
                 accurate, official details.
               </p>
-              <Link href="/about" className={styles.featureLink}>
-                Learn More <ArrowRight size={16} />
+              <Link
+                href="/about"
+                className={styles.featureLink}
+                aria-label="Learn more about our verified data sources"
+              >
+                Learn More <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -121,7 +133,7 @@ export default function Home() {
               </p>
               <Link href="/assistant" className={styles.primaryBtn}>
                 Chat with AI Assistant
-                <Sparkles size={18} />
+                <Sparkles size={18} aria-hidden="true" />
               </Link>
             </div>
           </div>

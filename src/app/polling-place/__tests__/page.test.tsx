@@ -18,10 +18,9 @@ describe('Polling Place Page', () => {
     // Check input exists
     expect(screen.getByLabelText(/Registered Address/i)).toBeInTheDocument();
 
-    // Check initial map placeholder text
-    expect(
-      screen.getByText(/Enter your address to see your polling location on the map/i)
-    ).toBeInTheDocument();
+    // Check initial map container exists
+    expect(screen.getByLabelText(/Map view/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Map showing polling places/i)).toBeInTheDocument();
   });
 
   it('handles address search and displays mock results', async () => {

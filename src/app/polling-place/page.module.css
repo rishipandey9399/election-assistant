@@ -190,7 +190,7 @@
   border-color: var(--border-focus);
 }
 
-.mapPlaceholder {
+.mapContainer {
   border-radius: var(--radius-lg);
   min-height: 400px;
   display: flex;
@@ -198,6 +198,7 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
+  background: var(--bg-tertiary);
 }
 
 .emptyMap {
@@ -212,65 +213,4 @@
 
 .emptyMapIcon {
   opacity: 0.5;
-}
-
-.mockMapContainer {
-  width: 100%;
-  height: 100%;
-  background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%23f1f5f9"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%23e2e8f0" stroke-width="2"/></svg>')
-    repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-/* Dark mode map background */
-@media (prefers-color-scheme: dark) {
-  .mockMapContainer {
-    background: url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="%231e293b"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%23334155" stroke-width="2"/></svg>')
-      repeat;
-  }
-}
-
-.mockMapPin {
-  position: relative;
-  z-index: 10;
-  transform: translateY(-16px);
-}
-
-.mockPulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  background: rgba(239, 68, 68, 0.4);
-  border-radius: 50%;
-  z-index: -1;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(2);
-    opacity: 0;
-  }
-}
-
-.mockMapLabel {
-  position: absolute;
-  top: calc(50% + 20px);
-  background: var(--bg-secondary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 0.875rem;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
 }
