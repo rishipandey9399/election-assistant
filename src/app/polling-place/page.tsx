@@ -91,6 +91,7 @@ export default function PollingPlacePage() {
                 type="submit"
                 className={styles.searchBtn}
                 disabled={isSearching}
+                aria-busy={isSearching}
                 onClick={(e) => {
                   if (isSearching) e.preventDefault();
                 }}

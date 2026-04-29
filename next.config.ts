@@ -2,8 +2,14 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  compress: true,
   output: 'standalone',
   poweredByHeader: false,
+  experimental: {
+    sri: {
+      algorithm: 'sha256',
+    },
+  },
   async headers() {
     return [
       {

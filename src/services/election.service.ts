@@ -47,22 +47,60 @@ export interface ElectionsResponse {
   elections: Election[];
 }
 
+export class CivicApiError extends Error {
+  constructor(
+    public status: number,
+    message: string
+  ) {
+    super(message);
+    this.name = 'CivicApiError';
+  }
+}
+
 /**
  * ElectionService handles interactions with the Google Civic Information API.
+ * Includes in-flight request deduplication to optimize concurrent API calls.
  */
 export class ElectionService {
   private apiKey: string;
   private baseUrl = 'https://www.googleapis.com/civicinfo/v2';
+  private pendingRequests = new Map<string, Promise<unknown>>();
 
   constructor(apiKey: string = env.GOOGLE_CIVIC_API_KEY) {
     this.apiKey = apiKey;
   }
 
   /**
+   * Helper method to deduplicate concurrent identical API requests.
+   * If a request for the given URL is already in flight, returns the existing Promise.
+   */
+  private async dedupeRequest<T>(url: string): Promise<T> {
+    if (this.pendingRequests.has(url)) {
+      return this.pendingRequests.get(url) as Promise<T>;
+    }
+
+    const requestPromise = fetch(url)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new CivicApiError(response.status, `Civic Info API error: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .finally(() => {
+        this.pendingRequests.delete(url);
+      });
+
+    this.pendingRequests.set(url, requestPromise);
+    return requestPromise;
+  }
+
+  /**
    * Fetches voter information including polling places and upcoming contests.
+   * Leverages request deduplication for optimal performance.
    *
    * @param address The registered address of the voter.
    * @returns A promise that resolves to the civic information data.
+   * @throws {CivicApiError} When the upstream API returns a non-200 response.
    */
   async getVoterInfo(address: string): Promise<VoterInfoResponse> {
     if (!address || address.trim() === '') {
@@ -71,11 +109,7 @@ export class ElectionService {
     const url = `${this.baseUrl}/voterinfo?key=${this.apiKey}&address=${encodeURIComponent(address)}&production=true`;
 
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Civic Info API error: ${response.statusText}`);
-      }
-      return (await response.json()) as VoterInfoResponse;
+      return await this.dedupeRequest<VoterInfoResponse>(url);
     } catch (error) {
       logger.error({ err: error, address }, 'ElectionService.getVoterInfo Error');
       throw error;
@@ -83,18 +117,16 @@ export class ElectionService {
   }
 
   /**
-   * Fetches a list of upcoming elections.
+   * Fetches a list of upcoming elections nationally and locally.
+   * Leverages request deduplication for optimal performance.
    *
    * @returns A promise that resolves to the elections list.
+   * @throws {CivicApiError} When the upstream API returns a non-200 response.
    */
   async getElections(): Promise<ElectionsResponse> {
     const url = `${this.baseUrl}/elections?key=${this.apiKey}`;
     try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Civic Info API error: ${response.statusText}`);
-      }
-      return (await response.json()) as ElectionsResponse;
+      return await this.dedupeRequest<ElectionsResponse>(url);
     } catch (error) {
       logger.error({ err: error }, 'ElectionService.getElections Error');
       throw error;

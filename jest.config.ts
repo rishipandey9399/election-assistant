@@ -40,21 +40,21 @@ const config: Config = {
    */
   coverageThreshold: {
     global: {
-      branches: 60,
-      functions: 55,
-      lines: 65,
-      statements: 65,
+      branches: 70,
+      functions: 75,
+      lines: 70,
+      statements: 70,
     },
     // Per-directory floors — enforced independently of global
     './src/lib/': {
-      branches: 65, // env.ts branches fully covered; cache/rateLimit cover most paths
-      functions: 30, // env.ts getters are infrastructure; logger is import-time config
+      branches: 70,
+      functions: 35,
       lines: 75,
       statements: 75,
     },
     './src/services/': {
       branches: 80,
-      functions: 85,
+      functions: 90,
       lines: 95,
       statements: 95,
     },
