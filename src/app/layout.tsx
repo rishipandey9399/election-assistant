@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Footer from '@/components/Footer';
 import Navigation from '@/components/Navigation';
+import SkipLink from '@/components/SkipLink';
+import { AuthProvider } from '@/context/AuthContext';
+import { validateEnv } from '@/lib/env';
 import './globals.css';
 
 const geistSans = Geist({
@@ -21,10 +24,6 @@ export const metadata: Metadata = {
   description:
     'Understand the election process, timelines, and steps in an interactive and easy-to-follow way.',
 };
-
-import SkipLink from '@/components/SkipLink';
-import { AuthProvider } from '@/context/AuthContext';
-import { validateEnv } from '@/lib/env';
 
 // Fail-fast environment validation
 validateEnv();

@@ -15,8 +15,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://apis.google.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app; img-src 'self' data: https://*.googleusercontent.com https://maps.gstatic.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.firebaseapp.com; worker-src 'self' blob:;",
+            value: `default-src 'self'; script-src 'self' https://maps.googleapis.com https://apis.google.com ${process.env.NODE_ENV === 'development' ? "'unsafe-eval' 'unsafe-inline'" : ''}; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasedatabase.app; img-src 'self' data: https://*.googleusercontent.com https://maps.gstatic.com https://*.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://*.firebaseapp.com; worker-src 'self' blob:;`,
           },
           {
             key: 'X-XSS-Protection',

@@ -5,9 +5,10 @@ import type { NextRequest } from 'next/server';
  * Strict Content Security Policy.
  * Only allows resources from trusted, known origins.
  */
+const isDev = process.env.NODE_ENV === 'development';
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://maps.gstatic.com",
+  `script-src 'self' https://maps.googleapis.com https://maps.gstatic.com ${isDev ? "'unsafe-inline' 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: blob: https://*.googleapis.com https://*.gstatic.com",
