@@ -98,9 +98,6 @@ export async function POST(req: Request) {
       message: 'Reminder notifications dispatched successfully',
     });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
-    }
     logger.error({ err: error }, 'Notification Error');
     return errorResponse(error);
   }
