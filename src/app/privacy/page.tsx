@@ -1,5 +1,6 @@
-import styles from './privacy.module.css';
 import { Shield } from 'lucide-react';
+
+import styles from './privacy.module.css';
 
 export default function PrivacyPage() {
   return (

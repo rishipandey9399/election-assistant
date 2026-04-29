@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import Navigation from '@/components/Navigation';
+
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import Footer from '@/components/Footer';
+import Navigation from '@/components/Navigation';
 import './globals.css';
 
 const geistSans = Geist({
@@ -20,10 +22,9 @@ export const metadata: Metadata = {
     'Understand the election process, timelines, and steps in an interactive and easy-to-follow way.',
 };
 
-import { AuthProvider } from '@/context/AuthContext';
 import SkipLink from '@/components/SkipLink';
+import { AuthProvider } from '@/context/AuthContext';
 import { validateEnv } from '@/lib/env';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Fail-fast environment validation
 validateEnv();
@@ -36,6 +37,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'VoteAssist',
+              operatingSystem: 'Web',
+              applicationCategory: 'GovernmentService',
+              description:
+                'AI-powered election assistant providing voting timelines and polling locations.',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+            }),
+          }}
+        />
         <ErrorBoundary>
           <AuthProvider>
             <SkipLink />

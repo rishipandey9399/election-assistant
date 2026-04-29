@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { rateLimit } from '@/lib/rateLimit';
-import { withCache } from '@/lib/cache';
-import { createElectionService } from '@/services/election.service';
+
 import { errorResponse } from '@/lib/api-utils';
+import { withCache } from '@/lib/cache';
 import { AppError, ErrorCode } from '@/lib/errors';
+import { rateLimit } from '@/lib/rateLimit';
+import { createElectionService } from '@/services/election.service';
 
 // Input validation schema
 const addressSchema = z.object({

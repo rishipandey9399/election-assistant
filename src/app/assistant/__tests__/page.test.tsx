@@ -1,4 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+
+jest.mock('@/lib/markdown', () => ({
+  parseMarkdown: (content: string) => content,
+}));
+
 import AssistantPage from '@/app/assistant/page';
 
 // Mock the lucide-react icons
@@ -8,6 +13,8 @@ jest.mock('lucide-react', () => ({
   Bot: () => <div data-testid="bot-icon" />,
   Sparkles: () => <div data-testid="sparkles-icon" />,
   Trash2: () => <div data-testid="trash-icon" />,
+  Copy: () => <div data-testid="copy-icon" />,
+  Check: () => <div data-testid="check-icon" />,
 }));
 
 // Mock the global fetch

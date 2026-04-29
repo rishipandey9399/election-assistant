@@ -1,6 +1,14 @@
 import '@testing-library/jest-dom';
 import 'whatwg-fetch';
 
+jest.mock('marked', () => ({
+  marked: { parse: (text: string) => `<p>${text}</p>` },
+}));
+
+jest.mock('dompurify', () => ({
+  sanitize: (html: string) => html,
+}));
+
 // Mock Redis globally to prevent open handles in tests
 jest.mock('@/lib/redis', () => ({
   redis: null,

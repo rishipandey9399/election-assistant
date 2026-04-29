@@ -33,7 +33,7 @@ jest.mock('@/lib/rateLimit', () => ({
 
 // Mock the cache utility
 jest.mock('@/lib/cache', () => ({
-  withCache: jest.fn((key: string, ttl: number, fetcher: () => Promise<unknown>) => fetcher()),
+  withCache: jest.fn((_key: string, _ttl: number, fetcher: () => Promise<unknown>) => fetcher()),
 }));
 
 // Mock logger

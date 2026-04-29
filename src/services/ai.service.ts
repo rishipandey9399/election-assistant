@@ -1,4 +1,6 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+
+import { AI_MODELS } from '@/lib/constants';
 import { env } from '@/lib/env';
 import logger from '@/lib/logger';
 
@@ -14,7 +16,7 @@ export class AIService {
     this.genAI = new GoogleGenerativeAI(apiKey);
 
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: AI_MODELS.PRIMARY_ASSISTANT,
       systemInstruction: `You are a helpful, non-partisan AI Election Assistant. 
       Your goal is to help users understand the voting process, registration deadlines, and how to vote. 
       Provide concise, accurate information. If you don't know something, advise them to check their 

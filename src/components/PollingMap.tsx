@@ -1,7 +1,8 @@
 'use client';
 
-import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 import { Loader } from '@googlemaps/js-api-loader';
+
+import { useGoogleMaps } from '@/hooks/useGoogleMaps';
 
 // Initialize loader options
 export const loader = new Loader({
@@ -18,7 +19,7 @@ type PollingMapProps = {
  * PollingMap component focuses strictly on rendering the UI.
  * Logic is encapsulated in useGoogleMaps hook.
  */
-export default function PollingMap({ address, pollingPlaces: _pollingPlaces }: PollingMapProps) {
+export default function PollingMap({ address }: PollingMapProps) {
   const { mapRef, loadError } = useGoogleMaps(address);
 
   if (loadError) {

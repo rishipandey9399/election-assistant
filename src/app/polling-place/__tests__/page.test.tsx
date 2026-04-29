@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+
 import PollingPlacePage from '@/app/polling-place/page';
 
 // Mock the lucide-react icons

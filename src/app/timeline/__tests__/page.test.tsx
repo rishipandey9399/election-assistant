@@ -1,7 +1,9 @@
-/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TimelinePage from '../page';
+
 import { useAuth } from '@/context/AuthContext';
+
+import TimelinePage from '../page';
 
 // Mock the Auth Context
 jest.mock('@/context/AuthContext', () => ({
@@ -55,7 +57,7 @@ describe('TimelinePage', () => {
   });
 
   it('toggles track status when clicked', async () => {
-    const { trackEvent, untrackEvent } = require('@/lib/firestore');
+    const { trackEvent } = require('@/lib/firestore');
     (useAuth as jest.MockedFunction<typeof useAuth>).mockReturnValue({
       user: { uid: 'test-user' } as any,
       signInWithGoogle: jest.fn(),

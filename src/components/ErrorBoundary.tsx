@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 /** Lightweight client-side logger — wraps console to allow future swap with a monitoring service. */
 const clientLogger = {
@@ -27,6 +27,7 @@ export class ErrorBoundary extends Component<Props, State> {
     hasError: false,
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public static getDerivedStateFromError(_e: Error): State {
     return { hasError: true };
   }

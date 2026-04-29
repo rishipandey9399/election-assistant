@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { rateLimit } from '@/lib/rateLimit';
+
+import { errorResponse } from '@/lib/api-utils';
 import { withCache } from '@/lib/cache';
+import { CACHE_TTL } from '@/lib/constants';
+import { AppError, ErrorCode } from '@/lib/errors';
+import { rateLimit } from '@/lib/rateLimit';
 import { createAIService } from '@/services/ai.service';
 import { analyticsService } from '@/services/analytics.service';
-import { errorResponse } from '@/lib/api-utils';
-import { AppError, ErrorCode } from '@/lib/errors';
 
 // Input validation schema
 const chatSchema = z.object({
@@ -29,7 +31,7 @@ export async function POST(req: Request) {
     const cacheKey = `chat_${message.trim().toLowerCase()}`;
 
     // 3. Service Call with Cache
-    const reply = await withCache(cacheKey, 3600000, async () => {
+    const reply = await withCache(cacheKey, CACHE_TTL.CHAT_RESPONSE_MS, async () => {
       // Mock mode check
       if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'mock-key') {
         await new Promise((resolve) => setTimeout(resolve, 1000));

@@ -52,7 +52,23 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 2. Prevent suspicious query parameters
+  // 2. Bot Detection
+  const userAgent = request.headers.get('user-agent') || '';
+  const suspiciousBots = ['curl', 'wget', 'python-requests', 'libwww-perl', 'postman'];
+  if (suspiciousBots.some((bot) => userAgent.toLowerCase().includes(bot))) {
+    // Only block if not in development
+    if (process.env.NODE_ENV === 'production') {
+      return new NextResponse(
+        JSON.stringify({
+          success: false,
+          error: { message: 'Automated access restricted', code: 'BOT_BLOCKED' },
+        }),
+        { status: 403, headers: { 'content-type': 'application/json' } }
+      );
+    }
+  }
+
+  // 3. Prevent suspicious query parameters
   const url = request.nextUrl;
   if (url.searchParams.has('script') || url.searchParams.has('exec')) {
     return new NextResponse(

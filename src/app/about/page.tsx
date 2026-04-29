@@ -1,5 +1,6 @@
-import styles from './about.module.css';
 import { Info, Target, ShieldCheck, Sparkles } from 'lucide-react';
+
+import styles from './about.module.css';
 
 export default function AboutPage() {
   return (

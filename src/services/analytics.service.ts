@@ -1,4 +1,5 @@
 import { BigQuery } from '@google-cloud/bigquery';
+
 import logger from '@/lib/logger';
 
 /**
@@ -23,7 +24,7 @@ export class AnalyticsService {
   async logInteraction(userId: string | null, question: string, response: string): Promise<void> {
     // Development/Mock check
     if (process.env.NODE_ENV === 'development' || !process.env.GOOGLE_CLOUD_PROJECT) {
-      console.log('[AnalyticsService Mock] Logging:', { userId, question });
+      console.info('[AnalyticsService Mock] Logging:', { userId, question });
       return;
     }
 

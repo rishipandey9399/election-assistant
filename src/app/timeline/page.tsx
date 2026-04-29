@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { Calendar, CheckCircle2, Clock, Bell, BellOff } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { useAuth } from '@/context/AuthContext';
 import { getUserProfile, trackEvent, untrackEvent, UserTimeline } from '@/lib/firestore';
+
 import styles from './page.module.css';
 
 export default function TimelinePage() {
@@ -99,7 +101,7 @@ export default function TimelinePage() {
                     {event.status === 'upcoming' && <Calendar size={16} aria-hidden="true" />}
                     {event.status === 'action-needed' && <Clock size={16} aria-hidden="true" />}
                   </div>
-                  {index !== events.length - 1 && <div className={styles.timelineLine}></div>}
+                  {index !== events.length - 1 && <div className={styles.timelineLine} />}
                 </div>
 
                 <div className={`${styles.timelineContent} glass-panel`}>

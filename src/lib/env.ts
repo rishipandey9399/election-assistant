@@ -62,6 +62,6 @@ export function validateEnv() {
       throw new Error(`Critical environment variables missing: ${Object.keys(issues).join(', ')}`);
     }
   } else {
-    console.log('✅ Environment variables validated');
+    console.info('✅ Environment variables validated');
   }
 }

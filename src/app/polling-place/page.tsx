@@ -1,8 +1,10 @@
 'use client';
-import { useState, useCallback } from 'react';
 import { MapPin, Search, Navigation } from 'lucide-react';
-import styles from './page.module.css';
+import { useState, useCallback } from 'react';
+
 import PollingMap from '@/components/PollingMap';
+
+import styles from './page.module.css';
 
 export default function PollingPlacePage() {
   const [address, setAddress] = useState('');

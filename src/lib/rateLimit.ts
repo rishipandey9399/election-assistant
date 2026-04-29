@@ -1,3 +1,4 @@
+import { RATE_LIMITS } from './constants';
 import { redis } from './redis';
 
 const memoryRateLimitMap = new Map<string, { count: number; timestamp: number }>();
@@ -10,8 +11,13 @@ const memoryRateLimitMap = new Map<string, { count: number; timestamp: number }>
  * @param windowMs Time window in milliseconds.
  * @returns Promise<boolean> - true if allowed, false if rate limited.
  */
-export async function rateLimit(req: Request, limit = 10, windowMs = 60000): Promise<boolean> {
-  const ip = req.headers.get('x-forwarded-for') || '127.0.0.1';
+export async function rateLimit(
+  req: Request,
+  limit = RATE_LIMITS.DEFAULT_MAX_REQUESTS,
+  windowMs = RATE_LIMITS.DEFAULT_WINDOW_MS
+): Promise<boolean> {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
   const key = `ratelimit:${ip}`;
 
   // 1. Try Redis

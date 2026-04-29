@@ -34,7 +34,7 @@ test.describe('Election Assistant E2E', () => {
     await page.waitForTimeout(2000);
 
     // 6. Test AI Chat Interaction
-    const chatInput = page.getByPlaceholder(/Ask me anything/i);
+    const chatInput = page.getByPlaceholder(/Ask about voter ID/i);
     await chatInput.waitFor({ state: 'visible' });
     await chatInput.fill('How do I register to vote?');
     await page.getByRole('button', { name: /Send/i }).click();

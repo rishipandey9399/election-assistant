@@ -1,5 +1,6 @@
-import styles from './faq.module.css';
 import { HelpCircle } from 'lucide-react';
+
+import styles from './faq.module.css';
 
 export default function FAQPage() {
   const faqs = [

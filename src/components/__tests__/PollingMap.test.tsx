@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { render, screen, waitFor } from '@testing-library/react';
+
 import PollingMap from '@/components/PollingMap';
 
 // Mock the Loader
@@ -18,7 +19,7 @@ jest.mock('@googlemaps/js-api-loader', () => ({
       if (lib === 'geocoding') {
         return Promise.resolve({
           Geocoder: jest.fn().mockImplementation(() => ({
-            geocode: jest.fn().mockImplementation((req, callback) => {
+            geocode: jest.fn().mockImplementation((_req, callback) => {
               callback([{ geometry: { location: { lat: () => 0, lng: () => 0 } } }], 'OK');
             }),
           })),
@@ -29,6 +30,7 @@ jest.mock('@googlemaps/js-api-loader', () => ({
           Marker: jest.fn().mockImplementation(() => ({})),
         });
       }
+      return Promise.resolve({});
     }),
   })),
 }));

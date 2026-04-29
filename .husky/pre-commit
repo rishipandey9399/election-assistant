@@ -1,1 +1,2 @@
 npx lint-staged
+git diff --cached --name-only | xargs grep -E "AIza[0-9A-Za-z_-]{35}" && echo "❌ Possible Google API Key leak detected!" && exit 1 || true

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import logger from '@/lib/logger';
+
 import { errorResponse } from '@/lib/api-utils';
+import logger from '@/lib/logger';
 
 /**
  * A notification service that can be triggered by a Cloud Scheduler

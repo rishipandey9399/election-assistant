@@ -1,9 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { Home, Calendar, MapPin, MessageSquare, Menu, X, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Calendar, MapPin, MessageSquare, Menu, X, User } from 'lucide-react';
+import { useState } from 'react';
+
 import { useAuth } from '@/context/AuthContext';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+
 import styles from './Navigation.module.css';
 
 export default function Navigation() {
@@ -17,6 +20,8 @@ export default function Navigation() {
     { name: 'Polling Place', href: '/polling-place', icon: MapPin },
     { name: 'AI Assistant', href: '/assistant', icon: MessageSquare },
   ];
+
+  const mobileMenuRef = useFocusTrap(isOpen);
 
   return (
     <nav className={styles.nav} aria-label="Main Navigation">
@@ -76,6 +81,7 @@ export default function Navigation() {
       {/* Mobile Nav */}
       <div
         id="mobile-menu"
+        ref={mobileMenuRef as React.RefObject<HTMLDivElement>}
         className={styles.mobileNav}
         style={{ display: isOpen ? 'flex' : 'none' }}
         aria-hidden={!isOpen}

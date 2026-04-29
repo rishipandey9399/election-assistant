@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+
 import { loader } from '@/components/PollingMap';
 
 /** Client-safe logger — wraps console to allow future swap with a monitoring service. */

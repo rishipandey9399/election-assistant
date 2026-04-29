@@ -1,6 +1,7 @@
+import { ArrowRight, Calendar, MapPin, ShieldCheck, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Calendar, MapPin, ShieldCheck, Sparkles } from 'lucide-react';
+
 import styles from './page.module.css';
 
 export default function Home() {
@@ -9,8 +10,8 @@ export default function Home() {
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroBackground}>
-          <div className={styles.glowBlob1}></div>
-          <div className={styles.glowBlob2}></div>
+          <div className={styles.glowBlob1} />
+          <div className={styles.glowBlob2} />
         </div>
 
         <div className={`container ${styles.heroContent}`}>

@@ -18,6 +18,7 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 import { getDoc } from 'firebase/firestore';
+
 import {
   syncUserProfile,
   getUserProfile,

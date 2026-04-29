@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { render, screen, fireEvent } from '@testing-library/react';
+
 import Navigation from '@/components/Navigation';
 
 // Mock next/navigation

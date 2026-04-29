@@ -16,7 +16,7 @@ jest.mock('@google-cloud/bigquery', () => {
 
 describe('AnalyticsService', () => {
   it('should log to console in dev mode', async () => {
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+    const consoleSpy = jest.spyOn(console, 'info').mockImplementation();
     const service = new AnalyticsService();
     await service.logInteraction('user1', 'hi', 'hello');
     expect(consoleSpy).toHaveBeenCalled();

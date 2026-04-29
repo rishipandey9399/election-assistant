@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`SkipLink renders skip link correctly 1`] = `
+<DocumentFragment>
+  <a
+    class="skipLink"
+    href="#main-content"
+  >
+    Skip to main content
+  </a>
+</DocumentFragment>
+`;

@@ -1,5 +1,6 @@
-import Link from 'next/link';
 import { Code, MessageCircle, Mail } from 'lucide-react';
+import Link from 'next/link';
+
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -18,14 +19,14 @@ export default function Footer() {
 
         <div className={styles.linksSection}>
           <div className={styles.linkGroup}>
-            <h4>Resources</h4>
+            <h2>Resources</h2>
             <Link href="/about">About Us</Link>
             <Link href="/faq">FAQ</Link>
             <Link href="/privacy">Privacy Policy</Link>
           </div>
 
           <div className={styles.linkGroup}>
-            <h4>Connect</h4>
+            <h2>Connect</h2>
             <div className={styles.social}>
               <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter">
                 <MessageCircle size={20} aria-hidden="true" />

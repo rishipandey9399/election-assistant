@@ -1,4 +1,5 @@
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+
 import { db } from './firebase';
 
 export type UserTimeline = {
