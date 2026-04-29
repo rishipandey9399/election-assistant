@@ -12,21 +12,52 @@ export default function PollingPlacePage() {
   const [result, setResult] = useState<null | Record<string, string>>(null);
 
   const handleSearch = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
       if (!address) return;
 
       setIsSearching(true);
-      // Simulate API call to Google Civic Info
-      setTimeout(() => {
-        setResult({
-          locationName: 'Community Center Gymnasium',
-          address: '123 Main Street, Anytown, CA 90210',
-          hours: '7:00 AM - 8:00 PM',
-          distance: '1.2 miles away',
+      try {
+        const response = await fetch('/api/civic-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address }),
         });
+
+        if (!response.ok) {
+          throw new Error('Failed to find polling place');
+        }
+
+        const data = await response.json();
+
+        if (data.pollingLocations && data.pollingLocations.length > 0) {
+          const location = data.pollingLocations[0];
+          setResult({
+            locationName:
+              location.locationName || location.address.locationName || 'Polling Location',
+            address: `${location.address.line1}, ${location.address.city}, ${location.address.state} ${location.address.zip}`,
+            hours: location.pollingHours || 'Unknown Hours',
+            distance: 'Check map', // We'd need Maps Matrix API for real distance
+          });
+        } else {
+          setResult({
+            locationName: 'No Polling Location Found',
+            address: 'We could not find a polling location for this address.',
+            hours: '',
+            distance: '',
+          });
+        }
+      } catch (error) {
+        console.error(error);
+        setResult({
+          locationName: 'Error',
+          address: 'Could not connect to the civic information service.',
+          hours: '',
+          distance: '',
+        });
+      } finally {
         setIsSearching(false);
-      }, 1500);
+      }
     },
     [address]
   );

@@ -25,21 +25,53 @@ describe('TimelinePage', () => {
       logout: jest.fn(),
       loading: false,
     });
+
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            elections: [
+              {
+                id: 'reg-deadline',
+                name: 'Voter Registration Deadline',
+                electionDay: '2024-10-07',
+                ocdDivisionId: 'ocd-division/country:us/state:ca',
+              },
+              {
+                id: 'election-day',
+                name: 'Election Day',
+                electionDay: '2024-11-05',
+                ocdDivisionId: 'ocd-division/country:us/state:ca',
+              },
+            ],
+          }),
+      })
+    ) as jest.Mock;
   });
 
-  it('renders the timeline header', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('renders the timeline header', async () => {
     render(<TimelinePage />);
     expect(screen.getByText('Your Election Timeline')).toBeInTheDocument();
   });
 
-  it('renders all mock events', () => {
+  it('renders all fetched events', async () => {
     render(<TimelinePage />);
-    expect(screen.getByText('Voter Registration Deadline')).toBeInTheDocument();
-    expect(screen.getByText('Election Day')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Voter Registration Deadline')).toBeInTheDocument();
+      expect(screen.getByText('Election Day')).toBeInTheDocument();
+    });
   });
 
-  it('hides track buttons when user is not logged in', () => {
+  it('hides track buttons when user is not logged in', async () => {
     render(<TimelinePage />);
+    await waitFor(() => {
+      expect(screen.getByText('Voter Registration Deadline')).toBeInTheDocument();
+    });
     expect(screen.queryByText('Track')).not.toBeInTheDocument();
   });
 

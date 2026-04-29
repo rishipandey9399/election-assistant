@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 import { errorResponse } from '@/lib/api-utils';
 import { withCache } from '@/lib/cache';
@@ -7,14 +6,9 @@ import { AppError, ErrorCode } from '@/lib/errors';
 import { rateLimit } from '@/lib/rateLimit';
 import { createElectionService } from '@/services/election.service';
 
-// Input validation schema
-const addressSchema = z.object({
-  address: z.string().min(5, 'Address is too short'),
-});
-
 const electionService = createElectionService();
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
     // 1. Rate Limiting Check
     const isAllowed = await rateLimit(req);
@@ -22,11 +16,7 @@ export async function POST(req: Request) {
       throw new AppError('Too many requests', ErrorCode.RATE_LIMIT_EXCEEDED, 429);
     }
 
-    // 2. Input Validation
-    const body = await req.json();
-    const { address } = addressSchema.parse(body);
-
-    const cacheKey = `civic_${address.trim().toLowerCase()}`;
+    const cacheKey = `civic_elections`;
 
     // 3. Service Call with Cache (24 hour)
     const data = await withCache(cacheKey, 86400000, async () => {
@@ -37,19 +27,29 @@ export async function POST(req: Request) {
       ) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
         return {
-          pollingLocations: [
+          elections: [
             {
-              locationName: 'Community Center Gymnasium',
-              address: { line1: '123 Main Street', city: 'Anytown', state: 'CA', zip: '90210' },
-              pollingHours: '7:00 AM - 8:00 PM',
+              id: 'mock-1',
+              name: 'Voter Registration Deadline',
+              electionDay: '2024-10-07',
+              ocdDivisionId: 'ocd-division/country:us/state:ca',
             },
-          ],
-          state: [
-            { name: 'California', electionAdministrationBody: { name: 'Secretary of State' } },
+            {
+              id: 'mock-2',
+              name: 'Early Voting Begins',
+              electionDay: '2024-10-28',
+              ocdDivisionId: 'ocd-division/country:us/state:ca',
+            },
+            {
+              id: 'mock-3',
+              name: 'General Election',
+              electionDay: '2024-11-05',
+              ocdDivisionId: 'ocd-division/country:us/state:ca',
+            },
           ],
         };
       }
-      return await electionService.getVoterInfo(address);
+      return await electionService.getElections();
     });
 
     return NextResponse.json(data);

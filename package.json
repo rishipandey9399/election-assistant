@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:ci": "jest --coverage --ci",
     "test:e2e": "playwright test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 import PollingPlacePage from '@/app/polling-place/page';
 
@@ -24,9 +24,23 @@ describe('Polling Place Page', () => {
     expect(screen.getByLabelText(/Map showing polling places/i)).toBeInTheDocument();
   });
 
-  it('handles address search and displays mock results', async () => {
-    // Use fake timers to speed up the setTimeout in the component
-    jest.useFakeTimers();
+  it('handles full polling place workflow: address -> civic API -> map render', async () => {
+    // Mock the fetch API
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            pollingLocations: [
+              {
+                locationName: 'Real Civic Polling Place',
+                address: { line1: '456 API Ave', city: 'Test City', state: 'TS', zip: '12345' },
+                pollingHours: '6:00 AM - 9:00 PM',
+              },
+            ],
+          }),
+      })
+    ) as jest.Mock;
 
     render(<PollingPlacePage />);
 
@@ -34,7 +48,7 @@ describe('Polling Place Page', () => {
     const searchButton = screen.getByRole('button', { name: /Find Location/i });
 
     // Type address
-    fireEvent.change(input, { target: { value: '123 Fake Street' } });
+    fireEvent.change(input, { target: { value: '456 API Ave' } });
 
     // Submit form
     fireEvent.click(searchButton);
@@ -42,22 +56,22 @@ describe('Polling Place Page', () => {
     // Should show searching state
     expect(screen.getByRole('button')).toHaveTextContent(/Searching.../i);
 
-    // Fast-forward timers to trigger setTimeout inside act
-    act(() => {
-      jest.advanceTimersByTime(1500);
-    });
-
-    // Wait for the result to be displayed
+    // Wait for the result to be displayed from the mocked API
     await waitFor(() => {
-      expect(screen.getAllByText('Community Center Gymnasium').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Real Civic Polling Place').length).toBeGreaterThan(0);
     });
 
-    expect(screen.getByText('123 Main Street, Anytown, CA 90210')).toBeInTheDocument();
-    expect(screen.getByText('7:00 AM - 8:00 PM')).toBeInTheDocument();
+    expect(screen.getByText('456 API Ave, Test City, TS 12345')).toBeInTheDocument();
+    expect(screen.getByText('6:00 AM - 9:00 PM')).toBeInTheDocument();
+
+    // Ensure fetch was called with the correct parameters
+    expect(global.fetch).toHaveBeenCalledWith('/api/civic-info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: '456 API Ave' }),
+    });
 
     // Search button should return to normal state
     expect(screen.getByRole('button', { name: /Find Location/i })).toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 });
