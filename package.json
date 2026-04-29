@@ -63,5 +63,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5",
     "whatwg-fetch": "^3.6.20"
+  },
+  "overrides": {
+    "postcss": "^8.5.10"
   }
 }

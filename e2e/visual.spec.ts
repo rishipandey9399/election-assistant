@@ -13,13 +13,13 @@ test.describe('Visual Regression (@visual)', () => {
 
   test('navigation looks correct', async ({ page }) => {
     await page.goto('/');
-    const nav = page.locator('nav');
+    const nav = page.getByRole('navigation', { name: 'Main Navigation' });
     await expect(nav).toHaveScreenshot('navigation.png');
   });
 
   test('footer looks correct', async ({ page }) => {
     await page.goto('/');
-    const footer = page.locator('footer');
+    const footer = page.getByRole('contentinfo');
     await expect(footer).toHaveScreenshot('footer.png');
   });
 });
