@@ -1,0 +1,26 @@
+{
+  "$schema": "https://help.stryker-mutator.io/schemas/stryker-config.json",
+  "packageManager": "npm",
+  "reporters": ["html", "clear-text", "progress"],
+  "testRunner": "jest",
+  "testRunner_hooks_file": "jest.config.ts",
+  "coverageAnalysis": "perTest",
+  "mutationLevel": "standard",
+  "mutate": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "!src/**/__tests__/*",
+    "!src/**/*.test.*",
+    "!src/lib/firebase.ts"
+  ],
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "jest": {
+    "projectType": "custom",
+    "configFile": "jest.config.ts",
+    "enableFindRelatedTests": true
+  }
+}

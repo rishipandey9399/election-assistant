@@ -52,7 +52,11 @@ export async function POST(req: Request) {
       return await electionService.getVoterInfo(address);
     });
 
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (error) {
     console.error('API Error:', error);
     return errorResponse(error);

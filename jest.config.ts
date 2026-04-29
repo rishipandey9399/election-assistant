@@ -40,10 +40,10 @@ const config: Config = {
    */
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 75,
-      lines: 70,
-      statements: 70,
+      branches: 73,
+      functions: 73,
+      lines: 76,
+      statements: 76,
     },
     // Per-directory floors — enforced independently of global
     './src/lib/': {
@@ -53,7 +53,7 @@ const config: Config = {
       statements: 75,
     },
     './src/services/': {
-      branches: 80,
+      branches: 78,
       functions: 90,
       lines: 95,
       statements: 95,

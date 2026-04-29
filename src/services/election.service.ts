@@ -71,6 +71,45 @@ export class ElectionService {
   }
 
   /**
+   * Internal fetch wrapper with timeout and retry logic.
+   */
+  private async fetchWithRetry(url: string, retries = 3, timeout = 10000): Promise<Response> {
+    const lastError: Error | null = null;
+
+    for (let i = 0; i < retries; i++) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(id);
+
+        if (response.status >= 500) {
+          throw new CivicApiError(response.status, `Server error: ${response.statusText}`);
+        }
+
+        return response;
+      } catch (err: unknown) {
+        clearTimeout(id);
+        const error = err as Error;
+
+        if (error.name === 'AbortError') {
+          logger.warn({ url, attempt: i + 1 }, 'ElectionService request timed out');
+        } else {
+          logger.warn({ url, attempt: i + 1, err }, 'ElectionService request failed');
+        }
+
+        // Exponential backoff: 500ms, 1000ms, 2000ms
+        if (i < retries - 1) {
+          await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 500));
+        }
+      }
+    }
+
+    throw lastError || new Error('Request failed after retries');
+  }
+
+  /**
    * Helper method to deduplicate concurrent identical API requests.
    * If a request for the given URL is already in flight, returns the existing Promise.
    */
@@ -79,7 +118,7 @@ export class ElectionService {
       return this.pendingRequests.get(url) as Promise<T>;
     }
 
-    const requestPromise = fetch(url)
+    const requestPromise = this.fetchWithRetry(url)
       .then(async (response) => {
         if (!response.ok) {
           throw new CivicApiError(response.status, `Civic Info API error: ${response.statusText}`);

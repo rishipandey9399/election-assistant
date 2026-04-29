@@ -92,10 +92,13 @@ export default function TimelinePage() {
     loadData();
   }, [fetchProfile, fetchElections]);
 
+  const [isTracking, setIsTracking] = useState<string | null>(null);
+
   const handleToggleTrack = async (eventId: string) => {
     if (!user) return;
 
     const isTracked = userProfile?.trackedEvents?.includes(eventId);
+    setIsTracking(eventId);
 
     try {
       if (isTracked) {
@@ -104,9 +107,11 @@ export default function TimelinePage() {
         await trackEvent(user.uid, eventId);
       }
       // Refresh local state
-      fetchProfile();
+      await fetchProfile();
     } catch (error) {
       console.error('Error toggling track status:', error);
+    } finally {
+      setIsTracking(null);
     }
   };
 
@@ -154,6 +159,8 @@ export default function TimelinePage() {
                           <button
                             className={`${styles.trackBtn} ${isTracked ? styles.tracked : ''}`}
                             onClick={() => handleToggleTrack(event.id)}
+                            disabled={isTracking === event.id}
+                            aria-busy={isTracking === event.id}
                             aria-label={
                               isTracked ? `Untrack ${event.title}` : `Track ${event.title}`
                             }

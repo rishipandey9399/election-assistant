@@ -1,6 +1,4 @@
-import Redis from 'ioredis';
-
-import { env } from './env';
+import logger from './logger';
 
 /**
  * Singleton Redis client.
@@ -9,6 +7,7 @@ import { env } from './env';
  */
 class RedisClient {
   private static instance: Redis | null = null;
+  private static metricInterval: NodeJS.Timeout | null = null;
 
   static getInstance(): Redis | null {
     if (!env.REDIS_URL) return null;
@@ -16,7 +15,7 @@ class RedisClient {
     if (!this.instance) {
       this.instance = new Redis(env.REDIS_URL, {
         maxRetriesPerRequest: 3,
-        lazyConnect: true, // Don't connect until first command
+        lazyConnect: true,
         retryStrategy(times) {
           const delay = Math.min(times * 50, 2000);
           return delay;
@@ -24,8 +23,29 @@ class RedisClient {
       });
 
       this.instance.on('error', (err) => {
-        console.warn('Redis connection error:', err.message);
+        logger.error({ err }, 'Redis connection error');
       });
+
+      this.instance.on('connect', () => {
+        logger.info('Redis connection established');
+      });
+
+      // Periodic metric reporting for BigQuery/Observability
+      if (!this.metricInterval && process.env.NODE_ENV === 'production') {
+        this.metricInterval = setInterval(() => {
+          if (this.instance) {
+            logger.info(
+              {
+                redis: {
+                  status: this.instance.status,
+                  ready: this.instance.status === 'ready',
+                },
+              },
+              'Redis Health Metrics'
+            );
+          }
+        }, 60000);
+      }
     }
 
     return this.instance;
@@ -33,6 +53,10 @@ class RedisClient {
 
   /** Gracefully close the connection (e.g., on shutdown or test teardown). */
   static async quit(): Promise<void> {
+    if (this.metricInterval) {
+      clearInterval(this.metricInterval);
+      this.metricInterval = null;
+    }
     if (this.instance) {
       await this.instance.quit();
       this.instance = null;

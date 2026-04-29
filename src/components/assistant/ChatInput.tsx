@@ -40,6 +40,7 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           disabled={!input.trim() || isLoading}
           className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
           aria-label="Send message"
+          aria-busy={isLoading}
         >
           <Send size={20} />
         </button>

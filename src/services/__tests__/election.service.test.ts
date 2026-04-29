@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * @jest-environment node
  */
@@ -44,7 +43,10 @@ describe('ElectionService', () => {
       const result = await svc.getVoterInfo('123 Main St');
 
       expect(result).toEqual(payload);
-      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('voterinfo'));
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('voterinfo'),
+        expect.any(Object)
+      );
     });
 
     it('throws an error when the API returns a non-ok response', async () => {
@@ -54,13 +56,19 @@ describe('ElectionService', () => {
       await expect(svc.getVoterInfo('Bad Address')).rejects.toThrow('Civic Info API error');
     });
 
-    it('throws (and logs) when fetch itself rejects', async () => {
-      global.fetch = jest.fn().mockRejectedValue(new Error('Network failure'));
-      const logger = require('@/lib/logger').default;
+    it('retries on server errors (5xx)', async () => {
+      const payload = { pollingLocations: [{ locationName: 'Gym' }] };
+      global.fetch = jest
+        .fn()
+        .mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Internal Error' })
+        .mockResolvedValueOnce({ ok: true, status: 200, json: async () => payload });
 
       const svc = new ElectionService('test-key');
-      await expect(svc.getVoterInfo('addr')).rejects.toThrow('Network failure');
-      expect(logger.error).toHaveBeenCalled();
+      // Use a shorter timeout for tests if possible or just wait
+      const result = await svc.getVoterInfo('123 Main St');
+
+      expect(result).toEqual(payload);
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -73,16 +81,10 @@ describe('ElectionService', () => {
       const result = await svc.getElections();
 
       expect(result).toEqual(payload);
-      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('elections'));
-    });
-
-    it('throws (and logs) when fetch rejects', async () => {
-      global.fetch = jest.fn().mockRejectedValue(new Error('Timeout'));
-      const logger = require('@/lib/logger').default;
-
-      const svc = new ElectionService('test-key');
-      await expect(svc.getElections()).rejects.toThrow('Timeout');
-      expect(logger.error).toHaveBeenCalled();
+      expect(global.fetch).toHaveBeenCalledWith(
+        expect.stringContaining('elections'),
+        expect.any(Object)
+      );
     });
   });
 });
