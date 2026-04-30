@@ -65,48 +65,103 @@ export class ElectionService {
   private apiKey: string;
   private baseUrl = 'https://www.googleapis.com/civicinfo/v2';
   private pendingRequests = new Map<string, Promise<unknown>>();
+  // Circuit Breaker State
+  private circuitStatus: 'CLOSED' | 'OPEN' | 'HALF_OPEN' = 'CLOSED';
+  private failureCount = 0;
+  private lastFailureTime = 0;
+  private readonly FAILURE_THRESHOLD = 5;
+  private readonly RECOVERY_TIMEOUT = 30000; // 30 seconds
 
   constructor(apiKey: string = env.GOOGLE_CIVIC_API_KEY) {
     this.apiKey = apiKey;
   }
 
   /**
-   * Internal fetch wrapper with timeout and retry logic.
+   * Internal fetch wrapper with timeout, retry, and circuit breaker logic.
    */
   private async fetchWithRetry(url: string, retries = 3, timeout = 10000): Promise<Response> {
-    const lastError: Error | null = null;
+    this.checkCircuitBreaker();
+
+    let lastError: Error | null = null;
 
     for (let i = 0; i < retries; i++) {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeout);
-
       try {
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(id);
-
-        if (response.status >= 500) {
-          throw new CivicApiError(response.status, `Server error: ${response.statusText}`);
-        }
-
-        return response;
+        return await this.performFetch(url, timeout);
       } catch (err: unknown) {
-        clearTimeout(id);
         const error = err as Error;
+        this.logFailure(url, i, error);
+        lastError = error;
 
-        if (error.name === 'AbortError') {
-          logger.warn({ url, attempt: i + 1 }, 'ElectionService request timed out');
-        } else {
-          logger.warn({ url, attempt: i + 1, err }, 'ElectionService request failed');
-        }
-
-        // Exponential backoff: 500ms, 1000ms, 2000ms
         if (i < retries - 1) {
-          await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 500));
+          await this.wait(Math.pow(2, i) * 500);
         }
       }
     }
 
+    this.onFailure();
     throw lastError || new Error('Request failed after retries');
+  }
+
+  private checkCircuitBreaker() {
+    if (this.circuitStatus === 'OPEN') {
+      const now = Date.now();
+      if (now - this.lastFailureTime > this.RECOVERY_TIMEOUT) {
+        this.circuitStatus = 'HALF_OPEN';
+        logger.info('Circuit Breaker: Attempting recovery (HALF_OPEN)');
+      } else {
+        throw new Error('Circuit Breaker: API is currently offline');
+      }
+    }
+  }
+
+  private async performFetch(url: string, timeout: number): Promise<Response> {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(id);
+
+      if (response.status >= 500) {
+        throw new CivicApiError(response.status, `Server error: ${response.statusText}`);
+      }
+
+      this.onSuccess();
+      return response;
+    } catch (error) {
+      clearTimeout(id);
+      throw error;
+    }
+  }
+
+  private logFailure(url: string, attempt: number, error: Error) {
+    if (error.name === 'AbortError') {
+      logger.warn({ url, attempt: attempt + 1 }, 'ElectionService request timed out');
+    } else {
+      logger.warn({ url, attempt: attempt + 1, err: error }, 'ElectionService request failed');
+    }
+  }
+
+  private async wait(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  private onSuccess() {
+    this.failureCount = 0;
+    this.circuitStatus = 'CLOSED';
+  }
+
+  private onFailure() {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+
+    if (this.failureCount >= this.FAILURE_THRESHOLD) {
+      this.circuitStatus = 'OPEN';
+      logger.error(
+        { failureCount: this.failureCount },
+        'Circuit Breaker: OPENED - Halting requests to upstream API'
+      );
+    }
   }
 
   /**

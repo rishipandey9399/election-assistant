@@ -87,4 +87,63 @@ describe('ElectionService', () => {
       );
     });
   });
+
+  describe('Circuit Breaker', () => {
+    beforeEach(() => {
+      // Mock the backoff delay to be instant
+      jest.spyOn(global, 'setTimeout').mockImplementation((cb) => {
+        if (typeof cb === 'function') cb();
+        return 0 as unknown as NodeJS.Timeout;
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('opens the circuit after 5 failures', async () => {
+      mockFetch({}, false, 500);
+      const svc = new ElectionService('test-key');
+
+      // Fail 5 times
+      for (let i = 0; i < 5; i++) {
+        await expect(svc.getElections()).rejects.toThrow();
+      }
+
+      // 6th call should fail immediately without fetch
+      await expect(svc.getElections()).rejects.toThrow('Circuit Breaker: API is currently offline');
+      expect(global.fetch).toHaveBeenCalledTimes(15);
+    });
+
+    it('recovers from OPEN to HALF_OPEN after timeout', async () => {
+      mockFetch({}, false, 500);
+      const svc = new ElectionService('test-key');
+
+      // Fail 5 times to OPEN the circuit
+      for (let i = 0; i < 5; i++) {
+        try {
+          await svc.getElections();
+        } catch {
+          // ignore
+        }
+      }
+
+      // Manually fast-forward the internal state for the test
+      // Since we can't easily access private members without casting
+      (svc as unknown as { lastFailureTime: number }).lastFailureTime = Date.now() - 31000;
+
+      const payload = { elections: [] };
+      // Instead of replacing the mock, we can just change its implementation
+      (global.fetch as jest.Mock).mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: async () => payload,
+      });
+
+      const result = await svc.getElections();
+      expect(result).toEqual(payload);
+      expect(global.fetch).toHaveBeenCalledTimes(16);
+      expect((svc as unknown as { circuitStatus: string }).circuitStatus).toBe('CLOSED');
+    }, 10000);
+  });
 });
