@@ -33,7 +33,7 @@ export const ChatInput = ({ onSendMessage, isLoading }: ChatInputProps) => {
           placeholder="Ask about voter ID, registration, or deadlines..."
           className="flex-grow bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-gray-500"
           disabled={isLoading}
-          aria-label="Your question"
+          aria-label="Ask anything about the election"
         />
         <button
           type="submit"
